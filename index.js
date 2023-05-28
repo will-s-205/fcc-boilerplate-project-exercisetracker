@@ -30,15 +30,28 @@ app.listen(port, function () {
 
 // Create a Model
 const shortenerSchema = new mongoose.Schema({
-  original_url: {
+  userName: {
     type: String,
     required: true
   },
-  short_url: {
+  userId: {
     type: String,
     required: true
   }
 });
 
-const Url_data = mongoose.model('Url_data', shortenerSchema);
+const exTrackDB = mongoose.model('DB', shortenerSchema);
 
+const createAndSaveDocument = async (urlString) => {
+  try {
+    const count = await DB.find().count();
+    const url = await new DB({
+      userName: urlString,
+      userId: count
+    });
+    url.save();
+    return url;
+  } catch (error) {
+    console.log(error.message);
+  }
+}
