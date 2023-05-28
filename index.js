@@ -18,40 +18,23 @@ const bodyParser = require('body-parser');
 
 ////////////////////////////////////////////////////////////
 
-app.post("/api/users", async (req, res) => {
-  res.json({ log: req.body.username }) // WORKS!!!
-})
-
 app.listen(port, function () {
   console.log(`Listening on port ${port}`);
 })
 
-////////////////////////////////////////////////////////////
+// Connect database
+mongoose.connect(process.env.MONGO_URI);
 
 // Create a Model
-const shortenerSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
   userName: {
     type: String,
     required: true
   },
   userId: {
-    type: String,
+    type: Number,
     required: true
   }
 });
 
-const exTrackDB = mongoose.model('DB', shortenerSchema);
-
-const createAndSaveDocument = async (urlString) => {
-  try {
-    const count = await DB.find().count();
-    const url = await new DB({
-      userName: urlString,
-      userId: count
-    });
-    url.save();
-    return url;
-  } catch (error) {
-    console.log(error.message);
-  }
-}
+const UserData = mongoose.model('UserData', userSchema);
