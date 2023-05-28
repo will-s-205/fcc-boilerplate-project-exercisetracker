@@ -38,3 +38,23 @@ const userSchema = new mongoose.Schema({
 });
 
 const UserData = mongoose.model('UserData', userSchema);
+
+const createAndSaveDocument = async (userString) => {
+  try {
+    const count = await UserData.find().count();
+    const user = await new UserData({
+      userName: userString,
+      userId: count
+    });
+    user.save();
+    return user;
+  } catch (error) {
+    console.log(error.message);
+  }
+}
+
+app.post("/api/users", async (req, res) => {
+  res.json({ log: req.body.username }) // WORKS!!!
+  createAndSaveDocument("useruser");
+})
+
