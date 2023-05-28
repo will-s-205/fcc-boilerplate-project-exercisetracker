@@ -1,29 +1,27 @@
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const app = express();
+// Set up mongoose
 const mongoose = require('mongoose');
-const express = require('express')
-const app = express()
-const cors = require('cors')
-require('dotenv').config()
-
+// Basic Configuration
+const port = process.env.PORT || 3000;
 app.use(cors())
 app.use(express.static('public'))
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html')
 });
-const listener = app.listen(process.env.PORT || 3000, () => {
-  console.log('Your app is listening on port ' + listener.address().port)
+// To handle POST
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+const bodyParser = require('body-parser');
+
+////////////////////////////////////////////////////////////
+
+app.post("/api/users", async (req, res) => {
+  res.json({ log: req.body.url }) // not showing anything
 })
 
-// Create a Model
-const userSchema = new mongoose.Schema({
-  original_url: {
-    type: String,
-    required: true
-  },
-  short_url: {
-    type: Number,
-    required: true
-  }
-});
-
-const UserData = mongoose.model('UserData', userSchema);
-
+app.listen(port, function () {
+  console.log(`Listening on port ${port}`);
+})
