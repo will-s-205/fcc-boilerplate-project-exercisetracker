@@ -19,9 +19,26 @@ const bodyParser = require('body-parser');
 ////////////////////////////////////////////////////////////
 
 app.post("/api/users", async (req, res) => {
-  res.json({ log: req.body.url }) // not showing anything
+  res.json({ log: req.body.username }) // WORKS!!!
 })
 
 app.listen(port, function () {
   console.log(`Listening on port ${port}`);
 })
+
+////////////////////////////////////////////////////////////
+
+// Create a Model
+const shortenerSchema = new mongoose.Schema({
+  original_url: {
+    type: String,
+    required: true
+  },
+  short_url: {
+    type: String,
+    required: true
+  }
+});
+
+const Url_data = mongoose.model('Url_data', shortenerSchema);
+
