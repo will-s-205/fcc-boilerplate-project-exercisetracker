@@ -61,4 +61,6 @@ app.post("/api/users", async (req, res) => {
       console.log("User is already exist in database");
     }
   }
+
+  createAndSaveDocument(postUserName);
 })
