@@ -40,20 +40,14 @@ const userSchema = new mongoose.Schema({
 
 const UserData = mongoose.model('UserData', userSchema);
 
-
-
 app.post("/api/users", async (req, res) => {
   const postUserName = req.body.username;
-  // res.json({ log: postUserName })
-
-
 
   const createAndSaveDocument = async (postUserName) => {
     const isUserExist = await UserData.findOne({ userName: postUserName });
     if (isUserExist == null) {
       try {
         console.log("Inserting new User into database: " + postUserName);
-        // const count = await UserData.find().count();
         const userData = await new UserData({
           userName: postUserName,
           userId: shortId.generate()
@@ -67,29 +61,4 @@ app.post("/api/users", async (req, res) => {
       console.log("User is already exist in database");
     }
   }
-
-
-
-  createAndSaveDocument(postUserName);
 })
-
-
-
-// app.post("/api/shorturl", async (req, res) => {
-//   try {
-//     const url = new URL(req.body.url);
-//     if (!['http:', 'https:'].includes(url.protocol)) throw Error;
-//     const url_data = await Url_data.findOne({ original_url: url });
-//     if (url_data != null) {
-//       req.link = url_data;
-//     } else {
-//       req.link = await createAndSaveDocument(url);
-//     }
-//     const { original_url, short_url } = req.link;
-//     res.json({ original_url, short_url });
-//   }
-//   catch (error) {
-//     res.json({ error: 'invalid url' })
-//   }
-// })
-
