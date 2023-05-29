@@ -38,7 +38,10 @@ const UserData = mongoose.model('UserData', userSchema);
 
 app.post("/api/users", async (req, res) => {
   const postUserName = req.body.username;
-  // res.json({ postUserName, userId });
+  
+  const userData = new UserData({
+    username: postUserName
+  })
 
   const createAndSaveDocument = async (postUserName) => {
     // find user in DB
@@ -47,57 +50,32 @@ app.post("/api/users", async (req, res) => {
     if (isUserExist == null) {
       try {
         console.log("Inserting new User into database: " + postUserName);
-        const userData = new UserData({
-          username: postUserName
-        })
         userData.save();
         const username = userData.username;
         const _id = userData._id;
+        // return respons as object with username and id
         return res.json({username, _id});
-        // return res.json({userData});
       } catch (error) {
         console.log(error.message);
       }
-    // if user exist then show a
+    // if user is exist then show a console log
     } else {
       console.log("User is already exist in database");
     }
   }
 
   createAndSaveDocument(postUserName);
-
-
 })
 
-app.post("/api/users/:_id/exercises", async (req, res) => {
-  // const postUserId = req.body._id;
-  // const userId = " "
-  let userId = req.body._id;
-  console.log(userId);
+// USAGE: http://localhost:3000/api/users/6474f9d7c18749bfc4d1e4ed
+app.get("/api/users/:_id", async (req, res) => {
+  const userId = req.params._id;
 
-  const createAndSaveDocument = async (postUserName) => {
-    const isIdExist = await UserData.findOne({ "_id": req.params._id });
-    console.log(isIdExist);
-
-    // if (isUserExist == null) {
-    //   try {
-    //     console.log("Inserting new User into database: " + postUserName);
-    //     const userData = new UserData({
-    //       username: postUserName
-    //     })
-    //     userData.save();
-    //     return res.json({userData});
-    //   } catch (error) {
-    //     console.log(error.message);
-    //   }
-    // } else {
-    //   console.log("User is already exist in database");
-    // }
-  }
-
-  // createAndSaveDocument(postUserName);
-
-
+  // find user by ID if exist
+  const findUsernameById = await UserData.findById({ "_id": userId });
+  console.log("User Data from DB found by id: "+findUsernameById.username+" "+findUsernameById._id);
+  const username = findUsernameById.username;
+  res.json({username, _id:userId});
 })
 
 // GET user's exercise log: GET /api/users/:_id/logs?[from][&to][&limit]
