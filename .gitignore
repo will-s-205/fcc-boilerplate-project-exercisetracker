@@ -128,5 +128,8 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# js copies
 index copy.js
 index copy 2.js
+index copy 3.js
