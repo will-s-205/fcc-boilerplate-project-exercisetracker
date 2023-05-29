@@ -49,11 +49,7 @@ app.post("/api/users", async (req, res) => {
           username: postUserName
         })
         userData.save();
-        const userName = userData.username;
-        const userId = userData._id;
-        return res.json({userName, userId});
-        // return userData.username, userData.userId;
-        // return   res.json(userData.username);
+        return res.json({userData});
       } catch (error) {
         console.log(error.message);
       }
