@@ -15,6 +15,7 @@ app.get('/', (req, res) => {
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 const bodyParser = require('body-parser');
+const shortId = require('shortid');
 
 ////////////////////////////////////////////////////////////
 
@@ -22,7 +23,7 @@ app.listen(port, function () {
   console.log(`Listening on port ${port}`);
 })
 
-// Connect database
+// Connect to database
 mongoose.connect(process.env.MONGO_URI);
 
 // Create a Model
@@ -32,7 +33,7 @@ const userSchema = new mongoose.Schema({
     required: true
   },
   userId: {
-    type: Number,
+    type: String,
     required: true
   }
 });
@@ -44,7 +45,7 @@ const createAndSaveDocument = async (userString) => {
     const count = await UserData.find().count();
     const user = await new UserData({
       userName: userString,
-      userId: count
+      userId: shortId.generate()
     });
     user.save();
     return user;
@@ -54,7 +55,28 @@ const createAndSaveDocument = async (userString) => {
 }
 
 app.post("/api/users", async (req, res) => {
-  res.json({ log: req.body.username }) // WORKS!!!
-  createAndSaveDocument("useruser");
+  const user = req.body.username;
+  res.json({ log: user }) 
+  createAndSaveDocument(user);
 })
+
+
+
+// app.post("/api/shorturl", async (req, res) => {
+//   try {
+//     const url = new URL(req.body.url);
+//     if (!['http:', 'https:'].includes(url.protocol)) throw Error;
+//     const url_data = await Url_data.findOne({ original_url: url });
+//     if (url_data != null) {
+//       req.link = url_data;
+//     } else {
+//       req.link = await createAndSaveDocument(url);
+//     }
+//     const { original_url, short_url } = req.link;
+//     res.json({ original_url, short_url });
+//   }
+//   catch (error) {
+//     res.json({ error: 'invalid url' })
+//   }
+// })
 
