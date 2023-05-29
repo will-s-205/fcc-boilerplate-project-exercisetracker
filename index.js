@@ -31,10 +31,6 @@ const userSchema = new mongoose.Schema({
   username: {
     type: String,
     required: true
-  },
-  userId: {
-    type: String,
-    required: true
   }
 });
 
@@ -42,6 +38,7 @@ const UserData = mongoose.model('UserData', userSchema);
 
 app.post("/api/users", async (req, res) => {
   const postUserName = req.body.username;
+  // res.json({ postUserName, userId });
 
   const createAndSaveDocument = async (postUserName) => {
     const isUserExist = await UserData.findOne({ username: postUserName });
@@ -49,11 +46,14 @@ app.post("/api/users", async (req, res) => {
       try {
         console.log("Inserting new User into database: " + postUserName);
         const userData = new UserData({
-          username: postUserName,
-          userId: shortId.generate()
-        });
+          username: postUserName
+        })
         userData.save();
-        return userData;
+        const userName = userData.username;
+        const userId = userData._id;
+        return res.json({userName, userId});
+        // return userData.username, userData.userId;
+        // return   res.json(userData.username);
       } catch (error) {
         console.log(error.message);
       }
