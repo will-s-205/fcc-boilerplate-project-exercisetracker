@@ -28,7 +28,7 @@ mongoose.connect(process.env.MONGO_URI);
 
 // Create a Model
 const userSchema = new mongoose.Schema({
-  userName: {
+  username: {
     type: String,
     required: true
   },
@@ -44,12 +44,12 @@ app.post("/api/users", async (req, res) => {
   const postUserName = req.body.username;
 
   const createAndSaveDocument = async (postUserName) => {
-    const isUserExist = await UserData.findOne({ userName: postUserName });
+    const isUserExist = await UserData.findOne({ username: postUserName });
     if (isUserExist == null) {
       try {
         console.log("Inserting new User into database: " + postUserName);
-        const userData = await new UserData({
-          userName: postUserName,
+        const userData = new UserData({
+          username: postUserName,
           userId: shortId.generate()
         });
         userData.save();
@@ -63,4 +63,6 @@ app.post("/api/users", async (req, res) => {
   }
 
   createAndSaveDocument(postUserName);
+
+
 })
