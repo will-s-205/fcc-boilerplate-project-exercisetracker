@@ -40,24 +40,37 @@ const userSchema = new mongoose.Schema({
 
 const UserData = mongoose.model('UserData', userSchema);
 
-const createAndSaveDocument = async (userString) => {
-  try {
-    const count = await UserData.find().count();
-    const user = await new UserData({
-      userName: userString,
-      userId: shortId.generate()
-    });
-    user.save();
-    return user;
-  } catch (error) {
-    console.log(error.message);
-  }
-}
+
 
 app.post("/api/users", async (req, res) => {
-  const user = req.body.username;
-  res.json({ log: user }) 
-  createAndSaveDocument(user);
+  const postUserName = req.body.username;
+  // res.json({ log: postUserName })
+
+
+
+  const createAndSaveDocument = async (postUserName) => {
+    const isUserExist = await UserData.findOne({ userName: postUserName });
+    if (isUserExist == null) {
+      try {
+        console.log("Inserting new User into database: " + postUserName);
+        // const count = await UserData.find().count();
+        const userData = await new UserData({
+          userName: postUserName,
+          userId: shortId.generate()
+        });
+        userData.save();
+        return userData;
+      } catch (error) {
+        console.log(error.message);
+      }
+    } else {
+      console.log("User is already exist in database");
+    }
+  }
+
+
+
+  createAndSaveDocument(postUserName);
 })
 
 
