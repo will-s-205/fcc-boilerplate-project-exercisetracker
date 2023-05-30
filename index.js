@@ -146,10 +146,10 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
 
         return res.json({
           username: findExerciseById.username,
-          _id: postUserId,
           description: req.body.description,
           duration: req.body.duration,
-          date: req.body.date
+          date: req.body.date,
+          _id: postUserId
         });
 
       } catch (error) {
