@@ -116,6 +116,12 @@ const ExercisesData = mongoose.model('ExercisesData', exercisesSchema);
 app.post("/api/users/:_id/exercises", async (req, res) => {
   const postUserId = req.params._id;
 
+  const findExerciseById = await UserData.findById({ _id: postUserId });
+  const username = findExerciseById.username;
+  const usernameDescription = findExerciseById.description;
+  const usernameDuration = findExerciseById.duration;
+  const usernameDate = findExerciseById.date;
+
   const exerciseData = new ExercisesData({
     username: postUserId,
     _id: postUserId,
@@ -125,15 +131,9 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
   })
 
   const createAndSaveExercise = async (postUserId) => {
-    const findExerciseById = await UserData.findById({ _id: postUserId });
-    if (isUserIdExist == null) {
+
+    if (findExerciseById != null) {
       try {
-        // console.log("Inserting new User into database: " + postUserId);
-        // exerciseData.save();
-        const username = findExerciseById.username;
-        const usernameDescription = findExerciseById.description;
-        const usernameDuration = findExerciseById.duration;
-        const usernameDate = findExerciseById.date;
         console.log("User Data from DB found by id: " +
           findExerciseById.username + " " +
           findExerciseById._id + " " +
@@ -146,7 +146,7 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
       }
       // if user is exist then show a console log
     } else {
-      console.log("Id is NOT exist in database");
+      console.log("Id does NOT exist in database");
     }
   }
 
