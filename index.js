@@ -83,13 +83,13 @@ app.post("/api/users", async (req, res) => {
 
   createAndSaveDocument(postUserName);
 })
-.get("/api/users", async (req, res) => {
-  // const userData = new UserData({
-  //   username
-  // })
-  const users = await UserData.find();
-  res.json(users);
-})
+  .get("/api/users", async (req, res) => {
+    // const userData = new UserData({
+    //   username
+    // })
+    const users = await UserData.find();
+    res.json(users);
+  })
 
 
 
@@ -121,6 +121,15 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
   const findExerciseById = await UserData.findById({ _id: postUserId });
   const updateExerciseById = async (postUserId) => {
     if (findExerciseById != null) {
+
+      if (
+        req.body.description === "" ||
+        req.body.duration === "" ||
+        req.body.userId === ""
+      ) {
+        return res.json({ error: "please enter required fields" });
+      }
+
       try {
         console.log("User Data from DB found by id: " +
           findExerciseById.username + " " +
@@ -128,26 +137,29 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
           findExerciseById.description + " " +
           findExerciseById.duration + " " +
           findExerciseById.date);
-        console.log(typeof findExerciseById.duration)
+
         await findExerciseById.updateOne({
-          description: req.body.description, 
+          description: req.body.description,
           duration: req.body.duration,
           date: (req.params.date) ? new Date(req.params.date) : new Date()
         })
+
         return res.json({
-          username: findExerciseById.username, 
-          _id: postUserId,  
+          username: findExerciseById.username,
+          _id: postUserId,
           description: req.body.description,
           duration: req.body.duration,
           date: req.body.date
         });
+
       } catch (error) {
         console.log(error.message);
       }
+
       // if id does not exist then show a console log
     } else {
       console.log("Requested ID does NOT exist in database");
-      return res.json({"error":"Requested ID does NOT exist in database"})
+      return res.json({ "error": "Requested ID does NOT exist in database" })
     }
   }
 
