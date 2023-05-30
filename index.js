@@ -141,15 +141,15 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
         await findExerciseById.updateOne({
           description: req.body.description,
           duration: req.body.duration,
-          date: (req.params.date) ? new Date(req.params.date) : new Date()
+          date: (req.body.date) ? new Date(req.body.date) : new Date()
         })
 
         return res.json({
           username: findExerciseById.username,
           description: req.body.description,
           duration: req.body.duration,
-          date: req.body.date,
-          _id: postUserId
+          _id: postUserId,
+          date: req.body.date
         });
 
       } catch (error) {
