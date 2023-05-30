@@ -1,3 +1,6 @@
+// GET user's exercise log: GET /api/users/:_id/logs?[from][&to][&limit]
+// https://exercise-tracker.freecodecamp.rocks/
+
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -15,9 +18,6 @@ app.get('/', (req, res) => {
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 const bodyParser = require('body-parser');
-const shortId = require('shortid');
-
-////////////////////////////////////////////////////////////
 
 app.listen(port, function () {
   console.log(`Listening on port ${port}`);
@@ -50,9 +50,6 @@ app.post("/api/users", async (req, res) => {
 
   const userData = new UserData({
     username: postUserName,
-    description: "no description", // no need to put it here. Use schema instead
-    duration: 1000,
-    date: "10/10/12"
   })
 
   const createAndSaveDocument = async (postUserName) => {
@@ -86,21 +83,8 @@ app.post("/api/users", async (req, res) => {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-// GET user's exercise log: GET /api/users/:_id/logs?[from][&to][&limit]
-// Get Query Parameter Input from the Client
-// https://www.freecodecamp.org/learn/back-end-development-and-apis/basic-node-and-express/get-query-parameter-input-from-the-client
-
 // Create a Model
 const exercisesSchema = new mongoose.Schema({
-  // username: {
-  //   type: String,
-  //   required: true
-  // },
-  // _id: {
-  //   type: String,
-  //   required: true
-  // },
   description: {
     type: String,
     required: true
@@ -116,56 +100,11 @@ const exercisesSchema = new mongoose.Schema({
 
 const ExercisesData = mongoose.model('ExercisesData', exercisesSchema);
 
-// app.post('/api/users/:_id/exercises', async (req,res) => {
-
-//   const exercise = new ExercisesData({
-//     userId: req.params._id,
-//     description: req.body.description,
-//     duration: req.body.duration,
-//     // date: (req.body.date) ? new Date(req.body.date) : new Date()
-//   })
-
-//     const findExerciseById = await ExercisesData.findById({ _id: exercise._id });
-//       const username = findExerciseById.username;
-//     res.json({ username, _id: postUserId})
-
-
-// try {
-//   const result = await exercise.save();
-//   const user = await User.findById(result.userId);
-//   res.json({username: user.username,description: result.description,duration: result.duration,date: result.date.toDateString(),_id: result.userId});
-// } catch (error) {
-//   res.send('Error');
-// }
-// });
-
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
 app.post("/api/users/:_id/exercises", async (req, res) => {
   const postUserId = req.params._id;
 
   const findExerciseById = await UserData.findById({ _id: postUserId });
-  // const usernameDB = findExerciseById.username;
-  // const usernameDescription = findExerciseById.description;
-  // const usernameDuration = findExerciseById.duration;
-  // const usernameDate = findExerciseById.date;
-
-  // const exerciseData = new ExercisesData({
-  //   username: postUserId,
-  //   _id: postUserId,
-  //   description: postUserId,
-  //   duration: postUserId,
-  //   date: postUserId
-  // })
-
   const updateExerciseById = async (postUserId) => {
-
     if (findExerciseById != null) {
       try {
         console.log("User Data from DB found by id: " +
@@ -174,15 +113,6 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
           findExerciseById.description + " " +
           findExerciseById.duration + " " +
           findExerciseById.date);
-        // res.json({
-        //   // no need to update username
-        //   // username: findExerciseById.username, 
-        //   // Performing an update on the path '_id' would modify the immutable field '_id'
-        //   // _id: postUserId,  
-        //   description: req.body.description,
-        //   duration: req.body.duration,
-        //   date: req.body.date
-        // });
         console.log(typeof findExerciseById.duration)
         await findExerciseById.updateOne({
           description: req.body.description, 
@@ -199,9 +129,10 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
       } catch (error) {
         console.log(error.message);
       }
-      // if user exist then show a console log
+      // if id does not exist then show a console log
     } else {
-      console.log("Id does NOT exist in database");
+      console.log("Requested ID does NOT exist in database");
+      return res.json({"error":"Requested ID does NOT exist in database"})
     }
   }
 
@@ -211,12 +142,13 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Debugging
 // USAGE: http://localhost:3000/api/users/6474f9d7c18749bfc4d1e4ed
 app.get("/api/users/:_id", async (req, res) => {
   const userId = req.params._id;
   console.log("\"GET ./api/users/:_id\"");
 
-  //   // find user by ID if exist
+  // find user by ID if exist
   const findUsernameById = await UserData.findById({ "_id": userId });
   console.log("\"User Data from DB found by id: " + findUsernameById.username + " " + findUsernameById._id + " " + findUsernameById.description + " " + findUsernameById.duration + " " + findUsernameById.date + "\"");
   const username = findUsernameById.username;
