@@ -130,6 +130,12 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
         return res.json({ error: "please enter required fields" });
       }
 
+      if (req.body.date !== "") {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(req.body.date)) {
+          return res.json({date: 'Incorrect date format'})
+        }
+      }
+
       try {
         console.log("User Data from DB found by id: " +
           findExerciseById.username + " " +
@@ -148,8 +154,8 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
           username: findExerciseById.username,
           description: req.body.description,
           duration: findExerciseById.duration,
+          date: req.body.date,
           _id: postUserId,
-          date: req.body.date
         });
 
       } catch (error) {
