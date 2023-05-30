@@ -174,21 +174,28 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
           findExerciseById.description + " " +
           findExerciseById.duration + " " +
           findExerciseById.date);
-        res.json({
-          // username: findExerciseById.username, // no need to update it
-          // _id: postUserId,  // Performing an update on the path '_id' would modify the immutable field '_id'
-          description: req.body.description,
-          duration: req.body.duration,
-          date: req.body.date
-        });
-
+        // res.json({
+        //   // no need to update username
+        //   // username: findExerciseById.username, 
+        //   // Performing an update on the path '_id' would modify the immutable field '_id'
+        //   // _id: postUserId,  
+        //   description: req.body.description,
+        //   duration: req.body.duration,
+        //   date: req.body.date
+        // });
         console.log(typeof findExerciseById.duration)
         await findExerciseById.updateOne({
           description: req.body.description, 
           duration: req.body.duration,
           date: req.body.date
         })
-        // return findExerciseById.save();
+        return res.json({
+          username: findExerciseById.username, 
+          _id: postUserId,  
+          description: req.body.description,
+          duration: req.body.duration,
+          date: req.body.date
+        });
       } catch (error) {
         console.log(error.message);
       }
