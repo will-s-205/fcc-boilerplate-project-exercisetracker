@@ -82,6 +82,9 @@ app.post("/api/users", async (req, res) => {
   createAndSaveDocument(postUserName);
 })
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 // GET user's exercise log: GET /api/users/:_id/logs?[from][&to][&limit]
@@ -90,14 +93,14 @@ app.post("/api/users", async (req, res) => {
 
 // Create a Model
 const exercisesSchema = new mongoose.Schema({
-  username: {
-    type: String,
-    required: true
-  },
-  _id: {
-    type: String,
-    required: true
-  },
+  // username: {
+  //   type: String,
+  //   required: true
+  // },
+  // _id: {
+  //   type: String,
+  //   required: true
+  // },
   description: {
     type: String,
     required: true
@@ -113,24 +116,55 @@ const exercisesSchema = new mongoose.Schema({
 
 const ExercisesData = mongoose.model('ExercisesData', exercisesSchema);
 
+// app.post('/api/users/:_id/exercises', async (req,res) => {
+
+//   const exercise = new ExercisesData({
+//     userId: req.params._id,
+//     description: req.body.description,
+//     duration: req.body.duration,
+//     // date: (req.body.date) ? new Date(req.body.date) : new Date()
+//   })
+
+//     const findExerciseById = await ExercisesData.findById({ _id: exercise._id });
+//       const username = findExerciseById.username;
+//     res.json({ username, _id: postUserId})
+
+
+// try {
+//   const result = await exercise.save();
+//   const user = await User.findById(result.userId);
+//   res.json({username: user.username,description: result.description,duration: result.duration,date: result.date.toDateString(),_id: result.userId});
+// } catch (error) {
+//   res.send('Error');
+// }
+// });
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
 app.post("/api/users/:_id/exercises", async (req, res) => {
   const postUserId = req.params._id;
 
   const findExerciseById = await UserData.findById({ _id: postUserId });
-  const username = findExerciseById.username;
-  const usernameDescription = findExerciseById.description;
-  const usernameDuration = findExerciseById.duration;
-  const usernameDate = findExerciseById.date;
+  // const usernameDB = findExerciseById.username;
+  // const usernameDescription = findExerciseById.description;
+  // const usernameDuration = findExerciseById.duration;
+  // const usernameDate = findExerciseById.date;
 
-  const exerciseData = new ExercisesData({
-    username: postUserId,
-    _id: postUserId,
-    description: postUserId,
-    duration: postUserId,
-    date: postUserId
-  })
+  // const exerciseData = new ExercisesData({
+  //   username: postUserId,
+  //   _id: postUserId,
+  //   description: postUserId,
+  //   duration: postUserId,
+  //   date: postUserId
+  // })
 
-  const createAndSaveExercise = async (postUserId) => {
+  const updateExerciseById = async (postUserId) => {
 
     if (findExerciseById != null) {
       try {
@@ -138,21 +172,37 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
           findExerciseById.username + " " +
           findExerciseById._id + " " +
           findExerciseById.description + " " +
+          findExerciseById.duration + " " +
           findExerciseById.date);
+        res.json({
+          // username: findExerciseById.username, // no need to update it
+          // _id: postUserId,  // Performing an update on the path '_id' would modify the immutable field '_id'
+          description: req.body.description,
+          duration: req.body.duration,
+          date: req.body.date
+        });
 
-        res.json({ username, _id: postUserId, usernameDescription, usernameDuration, usernameDate });
+        console.log(typeof findExerciseById.duration)
+        await findExerciseById.updateOne({
+          description: req.body.description, 
+          duration: req.body.duration,
+          date: req.body.date
+        })
+        // return findExerciseById.save();
       } catch (error) {
         console.log(error.message);
       }
-      // if user is exist then show a console log
+      // if user exist then show a console log
     } else {
       console.log("Id does NOT exist in database");
     }
   }
 
-  createAndSaveExercise(postUserId);
+  updateExerciseById(postUserId);
 })
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // USAGE: http://localhost:3000/api/users/6474f9d7c18749bfc4d1e4ed
 app.get("/api/users/:_id", async (req, res) => {
