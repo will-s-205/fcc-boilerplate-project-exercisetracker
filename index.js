@@ -31,6 +31,15 @@ const userSchema = new mongoose.Schema({
   username: {
     type: String,
     required: true
+  },
+  description: {
+    type: String
+  },
+  duration: {
+    type: Number
+  },
+  date: {
+    type: String
   }
 });
 
@@ -40,7 +49,10 @@ app.post("/api/users", async (req, res) => {
   const postUserName = req.body.username;
 
   const userData = new UserData({
-    username: postUserName
+    username: postUserName,
+    description: "no description", // no need to put it here. Use schema instead
+    duration: 1000,
+    date: "10/10/12"
   })
 
   const createAndSaveDocument = async (postUserName) => {
@@ -53,8 +65,11 @@ app.post("/api/users", async (req, res) => {
         userData.save();
         const username = userData.username;
         const _id = userData._id;
-        // return respons as object with username and id
-        return res.json({ username, _id });
+        const description = userData.description;
+        const duration = userData.duration;
+        const date = userData.date;
+        // return respons as object with data
+        return res.json({ username, _id, description, duration, date });
       } catch (error) {
         console.log(error.message);
       }
@@ -72,7 +87,6 @@ app.post("/api/users", async (req, res) => {
 // GET user's exercise log: GET /api/users/:_id/logs?[from][&to][&limit]
 // Get Query Parameter Input from the Client
 // https://www.freecodecamp.org/learn/back-end-development-and-apis/basic-node-and-express/get-query-parameter-input-from-the-client
-
 
 // Create a Model
 const exercisesSchema = new mongoose.Schema({
@@ -111,47 +125,47 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
   })
 
   const createAndSaveExercise = async (postUserId) => {
-    // find user in DB
-    const isUserIdExist = await ExercisesData.findOne({ _id: postUserId });
-
-    // if user doesn't exist then insert new
-
-
-
+    const findExerciseById = await UserData.findById({ _id: postUserId });
     if (isUserIdExist == null) {
       try {
         // console.log("Inserting new User into database: " + postUserId);
         // exerciseData.save();
-        const username = exerciseData.username;
-        const _id = exerciseData._id;
-        const description = exerciseData.description;
-        const duration = exerciseData.duration;
-        const date = exerciseData.date;
+        const username = findExerciseById.username;
+        const usernameDescription = findExerciseById.description;
+        const usernameDuration = findExerciseById.duration;
+        const usernameDate = findExerciseById.date;
+        console.log("User Data from DB found by id: " +
+          findExerciseById.username + " " +
+          findExerciseById._id + " " +
+          findExerciseById.description + " " +
+          findExerciseById.date);
 
-        // return respons as object with username and id
-        return res.json({ username, _id, description, duration, date});
+        res.json({ username, _id: postUserId, usernameDescription, usernameDuration, usernameDate });
       } catch (error) {
         console.log(error.message);
       }
       // if user is exist then show a console log
     } else {
-      console.log("Id is already exist in database");
+      console.log("Id is NOT exist in database");
     }
   }
 
   createAndSaveExercise(postUserId);
 })
 
-
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // USAGE: http://localhost:3000/api/users/6474f9d7c18749bfc4d1e4ed
 app.get("/api/users/:_id", async (req, res) => {
   const userId = req.params._id;
+  console.log("\"GET ./api/users/:_id\"");
 
-  // find user by ID if exist
+  //   // find user by ID if exist
   const findUsernameById = await UserData.findById({ "_id": userId });
-  console.log("User Data from DB found by id: " + findUsernameById.username + " " + findUsernameById._id);
+  console.log("\"User Data from DB found by id: " + findUsernameById.username + " " + findUsernameById._id + " " + findUsernameById.description + " " + findUsernameById.duration + " " + findUsernameById.date + "\"");
   const username = findUsernameById.username;
-  res.json({ username, _id: userId }); // OUTPUT: {"username":"rigo205@mail.com","_id":"647500f1ae45493e02adca23"}
+  const description = findUsernameById.description;
+  const duration = findUsernameById.duration;
+  const date = findUsernameById.date;
+  res.json({ username, _id: userId, description, duration, date }); // OUTPUT: {"username":"rigo205@mail.com","_id":"647500f1ae45493e02adca23"}
+  console.log("\"duration is a: " + typeof findUsernameById.duration + "\"")
 })
