@@ -132,7 +132,7 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
 
       if (req.body.date !== "") {
         if (!/^\d{4}-\d{2}-\d{2}$/.test(req.body.date)) {
-          return res.json({date: 'Incorrect date format'})
+          return res.json({ date: 'Incorrect date format' })
         }
       }
 
@@ -144,16 +144,17 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
           findExerciseById.duration + " " +
           findExerciseById.date);
 
+        const duration = parseInt(req.body.duration);
         await findExerciseById.updateOne({
           description: req.body.description,
-          duration: req.body.duration,
+          duration: duration,
           date: (req.body.date) ? new Date(req.body.date) : new Date()
         })
 
         return res.json({
           username: findExerciseById.username,
           description: req.body.description,
-          duration: findExerciseById.duration,
+          duration: duration,
           date: req.body.date,
           _id: postUserId,
         });
