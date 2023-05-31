@@ -135,18 +135,18 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
         req.body.duration === "" ||
         req.body.userId === ""
       ) {
-        return res.json({ error: "please enter required fields" });
+        res.send("please enter required fields")
       }
 
       if (req.body.date === "" || req.body.date === null) {
         req.body.date = new Date().toDateString();
       } else {
         if (!/^\d{4}-\d{2}-\d{2}$/.test(req.body.date)) {
-          return res.json({ date: 'Incorrect date format' })
+          res.send('Incorrect date format')
         }
       }
 
-      if (isNaN(req.body.duration)){
+      if (isNaN(req.body.duration)) {
         res.send("Duration should be a typeOf Number")
       }
 
@@ -158,10 +158,10 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
           findExerciseById.duration + " " +
           findExerciseById.date);
 
-        const count = await UserData.find().count();
+        // const count = await UserData.find().count();
         const duration = parseInt(req.body.duration);
         await findExerciseById.updateOne({
-          count: count,
+          // count: count,
           description: req.body.description,
           duration: duration,
           date: (req.body.date) ? new Date(req.body.date).toDateString() : new Date().toDateString()
@@ -219,3 +219,40 @@ app.get("/api/users/:_id", async (req, res) => {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // LOGS
 
+app.get("/api/users/:_id/logs", async (req, res) => {
+  // try {
+    const user = await UserData.findById(req.params._id);
+    let search = {userId: req.params._id};
+    if(req.query.from || req.query.to){
+      search.date = {};
+      if(req.query.from) search.date["$gt"] = new Date(req.query.from);
+      if(req.query.to) search.date["$lt"] = new Date(req.query.to);
+    }
+
+    let exercises;
+    if(req.query.limit){
+      exercises = await UserData.find(search).limit(parseInt(req.query.limit));
+    }else{
+      exercises = await UserData.find(search);
+    }
+
+    let log = exercises.map(exercise => {
+      return {
+        description: exercise.description,
+        duration: exercise.duration,
+        date: exercise.date.toDateString()
+      };
+    });
+
+    res.json({
+      username: user.username,
+      count: log.length,
+      _id: req.params._id,
+      log: log
+    });
+
+  // } catch (error) {
+  //   res.send('error');
+  // }
+
+})
