@@ -139,7 +139,7 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
       }
 
       try {
-        console.log("User Data from DB found by id: " +
+        console.log("User Data from DB: " +
           findExerciseById.username + " " +
           findExerciseById._id + " " +
           findExerciseById.description + " " +
@@ -167,7 +167,6 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
 
       // if id does not exist then show a console log
     } else {
-      console.log("Requested ID does NOT exist in database");
       return res.json({ "error": "Requested ID does NOT exist in database" })
     }
   }
@@ -180,6 +179,7 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // DEBBUGING
 // USAGE: http://localhost:3000/api/users/6474f9d7c18749bfc4d1e4ed
+// OUTPUT: {"username":"fcc_test_16854847331","description":"no no ","duration":2,"date":"Mon Feb 24 2020","_id":"647674bf90da111069d61c2f"}
 app.get("/api/users/:_id", async (req, res) => {
   const userId = req.params._id;
   console.log("\"GET ./api/users/:_id\"");
@@ -191,6 +191,12 @@ app.get("/api/users/:_id", async (req, res) => {
   const description = findUsernameById.description;
   const duration = findUsernameById.duration;
   const date = findUsernameById.date;
-  res.json({ username, _id: userId, description, duration, date }); // OUTPUT: {"username":"rigo205@mail.com","_id":"647500f1ae45493e02adca23"}
+  res.json({ username, _id: userId, description, duration, date }); 
   console.log("\"duration is a: " + typeof findUsernameById.duration + "\"")
 })
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// LOGS
+
