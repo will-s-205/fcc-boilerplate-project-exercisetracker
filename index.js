@@ -130,14 +130,12 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
         return res.json({ error: "please enter required fields" });
       }
 
-      if (req.body.date !== "") {
+      if (req.body.date === "" || req.body.date === null) {
+        req.body.date = new Date().toDateString();
+      } else {
         if (!/^\d{4}-\d{2}-\d{2}$/.test(req.body.date)) {
           return res.json({ date: 'Incorrect date format' })
         }
-      }
-
-      if (req.body.date === "" || req.body.date === null) {
-        req.body.date = new Date().toDateString();
       }
 
       try {
@@ -152,14 +150,14 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
         await findExerciseById.updateOne({
           description: req.body.description,
           duration: duration,
-          date: req.body.date
+          date: (req.body.date) ? new Date(req.body.date).toDateString() : new Date().toDateString()
         })
 
         return res.json({
           username: findExerciseById.username,
           description: req.body.description,
           duration: duration,
-          date: req.body.date,
+          date: new Date(req.body.date).toDateString(),
           _id: postUserId,
         });
 
