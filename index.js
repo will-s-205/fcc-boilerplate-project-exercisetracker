@@ -188,29 +188,36 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
 
   updateExerciseById(postUserId);
 })
+  // GET exercise by id for debugging
+  // USAGE: http://localhost:3000/api/users/6474f9d7c18749bfc4d1e4ed/exercise
+  // OUTPUT: {"username":"fcc_test_16854847331","description":"no no ","duration":2,"date":"Mon Feb 24 2020","_id":"647674bf90da111069d61c2f"}
+  .get("/api/users/:_id/exercises", async (req, res) => {
+    const userId = req.params._id;
 
+    const findUsernameById = await UserData.findById({ "_id": userId });
+    const username = findUsernameById.username;
+    const description = findUsernameById.description;
+    const duration = findUsernameById.duration;
+    const date = findUsernameById.date;
+    res.json({ username, _id: userId, description, duration, date });
+  })
+  // GET user by id for debugging
+  // USAGE: http://localhost:3000/api/users/6474f9d7c18749bfc4d1e4ed
+  // OUTPUT: {"username":"fcc_test_16854847331","description":"no no ","duration":2,"date":"Mon Feb 24 2020","_id":"647674bf90da111069d61c2f"}
+  .get("/api/users/:_id", async (req, res) => {
+    const userId = req.params._id;
+    console.log("\"GET ./api/users/:_id\"");
 
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// DEBBUGING
-// USAGE: http://localhost:3000/api/users/6474f9d7c18749bfc4d1e4ed
-// OUTPUT: {"username":"fcc_test_16854847331","description":"no no ","duration":2,"date":"Mon Feb 24 2020","_id":"647674bf90da111069d61c2f"}
-app.get("/api/users/:_id", async (req, res) => {
-  const userId = req.params._id;
-  console.log("\"GET ./api/users/:_id\"");
-
-  // find user by ID if exist
-  const findUsernameById = await UserData.findById({ "_id": userId });
-  console.log("\"User Data from DB found by id: " + findUsernameById.username + " " + findUsernameById._id + " " + findUsernameById.description + " " + findUsernameById.duration + " " + findUsernameById.date + "\"");
-  const username = findUsernameById.username;
-  const description = findUsernameById.description;
-  const duration = findUsernameById.duration;
-  const date = findUsernameById.date;
-  res.json({ username, _id: userId, description, duration, date });
-  console.log("\"duration is a: " + typeof findUsernameById.duration + "\"")
-})
+    // find user by ID if exist
+    const findUsernameById = await UserData.findById({ "_id": userId });
+    console.log("\"User Data from DB found by id: " + findUsernameById.username + " " + findUsernameById._id + " " + findUsernameById.description + " " + findUsernameById.duration + " " + findUsernameById.date + "\"");
+    const username = findUsernameById.username;
+    const description = findUsernameById.description;
+    const duration = findUsernameById.duration;
+    const date = findUsernameById.date;
+    res.json({ username, _id: userId, description, duration, date });
+    console.log("\"duration is a: " + typeof findUsernameById.duration + "\"")
+  })
 
 
 
@@ -221,35 +228,35 @@ app.get("/api/users/:_id", async (req, res) => {
 
 app.get("/api/users/:_id/logs", async (req, res) => {
   // try {
-    const user = await UserData.findById(req.params._id);
-    let search = {userId: req.params._id};
-    if(req.query.from || req.query.to){
-      search.date = {};
-      if(req.query.from) search.date["$gt"] = new Date(req.query.from);
-      if(req.query.to) search.date["$lt"] = new Date(req.query.to);
-    }
+  const user = await UserData.findById(req.params._id);
+  let search = { userId: req.params._id };
+  if (req.query.from || req.query.to) {
+    search.date = {};
+    if (req.query.from) search.date["$gt"] = new Date(req.query.from);
+    if (req.query.to) search.date["$lt"] = new Date(req.query.to);
+  }
 
-    let exercises;
-    if(req.query.limit){
-      exercises = await UserData.find(search).limit(parseInt(req.query.limit));
-    }else{
-      exercises = await UserData.find(search);
-    }
+  let exercises;
+  if (req.query.limit) {
+    exercises = await UserData.find(search).limit(parseInt(req.query.limit));
+  } else {
+    exercises = await UserData.find(search);
+  }
 
-    let log = exercises.map(exercise => {
-      return {
-        description: exercise.description,
-        duration: exercise.duration,
-        date: exercise.date.toDateString()
-      };
-    });
+  let log = exercises.map(exercise => {
+    return {
+      description: exercise.description,
+      duration: exercise.duration,
+      date: exercise.date.toDateString()
+    };
+  });
 
-    res.json({
-      username: user.username,
-      count: log.length,
-      _id: req.params._id,
-      log: log
-    });
+  res.json({
+    username: user.username,
+    count: log.length,
+    _id: req.params._id,
+    log: log
+  });
 
   // } catch (error) {
   //   res.send('error');
