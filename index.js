@@ -127,7 +127,6 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
   const postUserId = req.params._id;
 
   const findExerciseById = await UserData.findById({ _id: postUserId });
-  // const findExerciseByUsername = await UserData.findExerciseByUsername({ username: postUserId });
   const updateExerciseById = async (postUserId) => {
     if (findExerciseById != null) {
 
@@ -147,39 +146,9 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
         }
       }
 
-      const duration = parseInt(req.body.duration);
-      const count = await UserData.find({ username: findExerciseById.username }).count();
-      const userData = new UserData({
-        username: findExerciseById.username,
-        count: count,
-        description: req.body.description,
-        duration: duration,
-        date: (req.body.date) ? new Date(req.body.date).toDateString() : new Date().toDateString()
-      })
-
-      const updateExercise = async () => {
-        // find user in DB
-        const isUserExist = await UserData.findOne({ username: findExerciseById.username });
-        // if user doesn't exist then insert new
-        console.log("Updaing User info: " + findExerciseById.username);
-        userData.save();
-        const username = userData.username;
-        const _id = userData._id;
-        const description = userData.description;
-        const duration = userData.duration;
-        const date = userData.date;
-        // return respons as object with Exercise data
-        return res.json({
-          username: findExerciseById.username,
-          description: req.body.description,
-          duration: duration,
-          date: new Date(req.body.date).toDateString(),
-          _id: postUserId,
-        });
-
+      if (isNaN(req.body.duration)){
+        res.send("Duration should be a typeOf Number")
       }
-
-      updateExercise();
 
       try {
         console.log("User Data from DB: " +
@@ -189,22 +158,22 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
           findExerciseById.duration + " " +
           findExerciseById.date);
 
-        // const count = await UserData.find().count();
-        // const duration = parseInt(req.body.duration);
-        // await findExerciseById.updateOne({
-        //   // count: count,
-        //   description: req.body.description,
-        //   duration: duration,
-        //   date: (req.body.date) ? new Date(req.body.date).toDateString() : new Date().toDateString()
-        // })
+        const count = await UserData.find().count();
+        const duration = parseInt(req.body.duration);
+        await findExerciseById.updateOne({
+          count: count,
+          description: req.body.description,
+          duration: duration,
+          date: (req.body.date) ? new Date(req.body.date).toDateString() : new Date().toDateString()
+        })
 
-        // return res.json({
-        //   username: findExerciseById.username,
-        //   description: req.body.description,
-        //   duration: duration,
-        //   date: new Date(req.body.date).toDateString(),
-        //   _id: postUserId,
-        // });
+        return res.json({
+          username: findExerciseById.username,
+          description: req.body.description,
+          duration: duration,
+          date: new Date(req.body.date).toDateString(),
+          _id: postUserId,
+        });
 
       } catch (error) {
         console.log(error.message);
@@ -212,7 +181,8 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
 
       // if id does not exist then show a console log
     } else {
-      return res.json({ "error": "Requested ID does NOT exist in database" })
+      // return res.json({ "error": "Requested ID does NOT exist in database" })
+      res.send("Requested ID does NOT exist in database")
     }
   }
 
