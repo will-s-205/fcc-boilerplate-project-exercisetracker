@@ -1,3 +1,4 @@
+// PRE-REQUISITIES: start http://localhost:3000/; nodemon .\index.js
 // GET user's exercise log: GET /api/users/:_id/logs?[from][&to][&limit]
 // https://exercise-tracker.freecodecamp.rocks/
 
@@ -45,6 +46,9 @@ const userSchema = new mongoose.Schema({
   },
   date: {
     type: String
+  },
+  count: {
+    type: Number
   }
 });
 
@@ -52,9 +56,10 @@ const UserData = mongoose.model('UserData', userSchema);
 
 app.post("/api/users", async (req, res) => {
   const postUserName = req.body.username;
-
+  const count = await UserData.find().count();
   const userData = new UserData({
     username: postUserName,
+    count: count
   })
 
   const createAndSaveDocument = async (postUserName) => {
@@ -71,22 +76,21 @@ app.post("/api/users", async (req, res) => {
         const duration = userData.duration;
         const date = userData.date;
         // return respons as object with data
-        return res.json({ username, _id, description, duration, date });
+        return res.json({ count, username, _id, description, duration, date });
       } catch (error) {
         console.log(error.message);
       }
       // if user is exist then show a console log
     } else {
       console.log("User is already exist in database");
+      return res.json({"user":"User is alredy exist in DB"});
     }
   }
 
   createAndSaveDocument(postUserName);
 })
+// get a list of all users. Returns an array.
   .get("/api/users", async (req, res) => {
-    // const userData = new UserData({
-    //   username
-    // })
     const users = await UserData.find();
     res.json(users);
   })
@@ -114,6 +118,8 @@ const exercisesSchema = new mongoose.Schema({
 });
 
 // const ExercisesData = mongoose.model('ExercisesData', exercisesSchema);
+// const UserData = mongoose.model('UserData', userSchema);
+// const ExercisesData = mongoose.model('UserData', exercisesSchema); // same userData DB but schema is different
 
 app.post("/api/users/:_id/exercises", async (req, res) => {
   const postUserId = req.params._id;
@@ -146,8 +152,10 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
           findExerciseById.duration + " " +
           findExerciseById.date);
 
+        const count = await UserData.find().count();
         const duration = parseInt(req.body.duration);
         await findExerciseById.updateOne({
+          count: count,
           description: req.body.description,
           duration: duration,
           date: (req.body.date) ? new Date(req.body.date).toDateString() : new Date().toDateString()
@@ -191,7 +199,7 @@ app.get("/api/users/:_id", async (req, res) => {
   const description = findUsernameById.description;
   const duration = findUsernameById.duration;
   const date = findUsernameById.date;
-  res.json({ username, _id: userId, description, duration, date }); 
+  res.json({ username, _id: userId, description, duration, date });
   console.log("\"duration is a: " + typeof findUsernameById.duration + "\"")
 })
 
