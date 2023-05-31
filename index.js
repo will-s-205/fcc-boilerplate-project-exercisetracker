@@ -113,7 +113,7 @@ const exercisesSchema = new mongoose.Schema({
   }
 });
 
-const ExercisesData = mongoose.model('ExercisesData', exercisesSchema);
+// const ExercisesData = mongoose.model('ExercisesData', exercisesSchema);
 
 app.post("/api/users/:_id/exercises", async (req, res) => {
   const postUserId = req.params._id;
@@ -136,6 +136,10 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
         }
       }
 
+      if (req.body.date === "" || req.body.date === null) {
+        req.body.date = new Date().toDateString();
+      }
+
       try {
         console.log("User Data from DB found by id: " +
           findExerciseById.username + " " +
@@ -148,7 +152,7 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
         await findExerciseById.updateOne({
           description: req.body.description,
           duration: duration,
-          date: (req.body.date) ? new Date(req.body.date) : new Date()
+          date: req.body.date
         })
 
         return res.json({
