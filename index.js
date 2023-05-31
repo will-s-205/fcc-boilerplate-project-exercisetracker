@@ -24,6 +24,8 @@ app.listen(port, function () {
   console.log(`Listening on port ${port}`);
 })
 
+
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -56,10 +58,10 @@ const UserData = mongoose.model('UserData', userSchema);
 
 app.post("/api/users", async (req, res) => {
   const postUserName = req.body.username;
-  const count = await UserData.find().count();
+  // const count = await UserData.find().count();
   const userData = new UserData({
     username: postUserName,
-    count: count
+    // count: count
   })
 
   const createAndSaveDocument = async (postUserName) => {
@@ -76,20 +78,20 @@ app.post("/api/users", async (req, res) => {
         const duration = userData.duration;
         const date = userData.date;
         // return respons as object with data
-        return res.json({ count, username, _id, description, duration, date });
+        return res.json({ username, _id, description, duration, date });
       } catch (error) {
         console.log(error.message);
       }
       // if user is exist then show a console log
     } else {
       console.log("User is already exist in database");
-      return res.json({"user":"User is alredy exist in DB"});
+      return res.json({ "user": "User is alredy exist in DB" });
     }
   }
 
   createAndSaveDocument(postUserName);
 })
-// get a list of all users. Returns an array.
+  // get a list of all users. Returns an array.
   .get("/api/users", async (req, res) => {
     const users = await UserData.find();
     res.json(users);
@@ -125,6 +127,7 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
   const postUserId = req.params._id;
 
   const findExerciseById = await UserData.findById({ _id: postUserId });
+  // const findExerciseByUsername = await UserData.findExerciseByUsername({ username: postUserId });
   const updateExerciseById = async (postUserId) => {
     if (findExerciseById != null) {
 
@@ -144,6 +147,40 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
         }
       }
 
+      const duration = parseInt(req.body.duration);
+      const count = await UserData.find({ username: findExerciseById.username }).count();
+      const userData = new UserData({
+        username: findExerciseById.username,
+        count: count,
+        description: req.body.description,
+        duration: duration,
+        date: (req.body.date) ? new Date(req.body.date).toDateString() : new Date().toDateString()
+      })
+
+      const updateExercise = async () => {
+        // find user in DB
+        const isUserExist = await UserData.findOne({ username: findExerciseById.username });
+        // if user doesn't exist then insert new
+        console.log("Updaing User info: " + findExerciseById.username);
+        userData.save();
+        const username = userData.username;
+        const _id = userData._id;
+        const description = userData.description;
+        const duration = userData.duration;
+        const date = userData.date;
+        // return respons as object with Exercise data
+        return res.json({
+          username: findExerciseById.username,
+          description: req.body.description,
+          duration: duration,
+          date: new Date(req.body.date).toDateString(),
+          _id: postUserId,
+        });
+
+      }
+
+      updateExercise();
+
       try {
         console.log("User Data from DB: " +
           findExerciseById.username + " " +
@@ -152,22 +189,22 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
           findExerciseById.duration + " " +
           findExerciseById.date);
 
-        const count = await UserData.find().count();
-        const duration = parseInt(req.body.duration);
-        await findExerciseById.updateOne({
-          count: count,
-          description: req.body.description,
-          duration: duration,
-          date: (req.body.date) ? new Date(req.body.date).toDateString() : new Date().toDateString()
-        })
+        // const count = await UserData.find().count();
+        // const duration = parseInt(req.body.duration);
+        // await findExerciseById.updateOne({
+        //   // count: count,
+        //   description: req.body.description,
+        //   duration: duration,
+        //   date: (req.body.date) ? new Date(req.body.date).toDateString() : new Date().toDateString()
+        // })
 
-        return res.json({
-          username: findExerciseById.username,
-          description: req.body.description,
-          duration: duration,
-          date: new Date(req.body.date).toDateString(),
-          _id: postUserId,
-        });
+        // return res.json({
+        //   username: findExerciseById.username,
+        //   description: req.body.description,
+        //   duration: duration,
+        //   date: new Date(req.body.date).toDateString(),
+        //   _id: postUserId,
+        // });
 
       } catch (error) {
         console.log(error.message);
@@ -181,6 +218,8 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
 
   updateExerciseById(postUserId);
 })
+
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -202,6 +241,8 @@ app.get("/api/users/:_id", async (req, res) => {
   res.json({ username, _id: userId, description, duration, date });
   console.log("\"duration is a: " + typeof findUsernameById.duration + "\"")
 })
+
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
