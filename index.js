@@ -232,10 +232,10 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
 
     const findUsernameById = await UserData.findById({ "_id": userId });
     const username = findUsernameById.username;
-    const description = findUsernameById.log[findUsernameById.log.length-1].description;
-    const duration = findUsernameById.log[findUsernameById.log.length-1].duration;
-    const date = findUsernameById.log[findUsernameById.log.length-1].date;
-    res.json({ username, _id: userId, description, duration, date });
+    const description = findUsernameById.log[findUsernameById.log.length - 1].description;
+    const duration = findUsernameById.log[findUsernameById.log.length - 1].duration;
+    const date = findUsernameById.log[findUsernameById.log.length - 1].date;
+    res.json({ username, description, duration, date, _id: userId });
   })
   // GET user by id for debugging
   // USAGE: http://localhost:3000/api/users/6474f9d7c18749bfc4d1e4ed
@@ -248,10 +248,10 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
     const findUsernameById = await UserData.findById({ "_id": userId });
     console.log("\"User Data from DB found by id: " + findUsernameById.username + " " + findUsernameById._id + " " + findUsernameById.description + " " + findUsernameById.duration + " " + findUsernameById.date + "\"");
     const username = findUsernameById.username;
-    const description = findUsernameById.log[findUsernameById.log.length-1].description;
-    const duration = findUsernameById.log[findUsernameById.log.length-1].duration;
-    const date = findUsernameById.log[findUsernameById.log.length-1].date;
-    res.json({ username, _id: userId, description, duration, date });
+    const description = findUsernameById.log[findUsernameById.log.length - 1].description;
+    const duration = findUsernameById.log[findUsernameById.log.length - 1].duration;
+    const date = findUsernameById.log[findUsernameById.log.length - 1].date;
+    res.json({ username, description, duration, date, _id: userId });
     console.log("\"duration is a: " + typeof findUsernameById.log.duration + "\"")
   })
 
@@ -260,53 +260,22 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// LOGS
+// LOGS AND FILTERS
 
 app.get("/api/users/:_id/logs", async (req, res) => {
-  // try {
+  const from = new Date(req.query.from).toDateString();
+  const to = new Date(req.query.to).toDateString();
+  const limit = req.query.limit;
+
+  console.log(from)
+
   const userData = await UserData.findById(req.params._id);
 
-  // let logs = await UserData.findById(req.params._id);
-  // logs.map();
-
-  // let search = { userId: req.params._id };
-  // if (req.query.from || req.query.to) {
-  //   search.date = {};
-  //   if (req.query.from) search.date["$gt"] = new Date(req.query.from);
-  //   if (req.query.to) search.date["$lt"] = new Date(req.query.to);
-  // }
-
-  // let exercises;
-  // if (req.query.limit) {
-  //   exercises = await UserData.find(search).limit(parseInt(req.query.limit));
-  // } else {
-  //   exercises = await UserData.find(search);
-  // }
-
-  // let log = exercises.map(exercise => {
-  //   return {
-  //     description: exercise.description,
-  //     duration: exercise.duration,
-  //     date: exercise.date.toDateString()
-  //   };
-  // });
-
+  // res.send(from)
   res.json({
     username: userData.username,
     count: userData.log.length,
     _id: req.params._id,
     log: userData.log
   });
-
-  // res.json({
-  //   username: user.username,
-  //   count: log.length,
-  //   _id: req.params._id,
-  //   log: log
-  // });
-
-  // } catch (error) {
-  //   res.send('error');
-  // }
-
 })
