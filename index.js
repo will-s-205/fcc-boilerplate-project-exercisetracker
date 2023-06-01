@@ -51,6 +51,17 @@ const userSchema = new mongoose.Schema({
   },
   count: {
     type: Number
+  },
+  log: {
+    type: [
+      //   {
+      //   description: { type: String, required: true },
+      //   duration: { type: Number, required: true },
+      //   date: { type: String, required: true },
+      //   _id: {type: mongoose.Types.ObjectId, select: false}
+      // }
+    ],
+    // default: []
   }
 });
 
@@ -160,11 +171,36 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
 
         // const count = await UserData.find().count();
         const duration = parseInt(req.body.duration);
-        await findExerciseById.updateOne({
-          // count: count,
+
+        // await findExerciseById.updateOne(
+        //   { _id: postUserId },
+        //   { $push: { log:{aba: 445, dada: 785} }}
+        // )
+
+        // const logData = {
+        //   description: req.body.description,
+        //   duration: duration,
+        //   date: (req.body.date) ? new Date(req.body.date).toDateString() : new Date().toDateString(),
+        // }
+
+        const logData = [{
           description: req.body.description,
           duration: duration,
-          date: (req.body.date) ? new Date(req.body.date).toDateString() : new Date().toDateString()
+          date: (req.body.date) ? new Date(req.body.date).toDateString() : new Date().toDateString(),
+        }]
+
+        await findExerciseById.updateOne({
+          // count: count,
+          // description: req.body.description,
+          // duration: duration,
+          // date: (req.body.date) ? new Date(req.body.date).toDateString() : new Date().toDateString(),
+          $push: {
+            log: {
+              description: req.body.description,
+              duration: duration,
+              date: (req.body.date) ? new Date(req.body.date).toDateString() : new Date().toDateString(),
+            }
+          }
         })
 
         return res.json({
@@ -196,9 +232,9 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
 
     const findUsernameById = await UserData.findById({ "_id": userId });
     const username = findUsernameById.username;
-    const description = findUsernameById.description;
-    const duration = findUsernameById.duration;
-    const date = findUsernameById.date;
+    const description = findUsernameById.log[findUsernameById.log.length-1].description;
+    const duration = findUsernameById.log[findUsernameById.log.length-1].duration;
+    const date = findUsernameById.log[findUsernameById.log.length-1].date;
     res.json({ username, _id: userId, description, duration, date });
   })
   // GET user by id for debugging
@@ -212,11 +248,11 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
     const findUsernameById = await UserData.findById({ "_id": userId });
     console.log("\"User Data from DB found by id: " + findUsernameById.username + " " + findUsernameById._id + " " + findUsernameById.description + " " + findUsernameById.duration + " " + findUsernameById.date + "\"");
     const username = findUsernameById.username;
-    const description = findUsernameById.description;
-    const duration = findUsernameById.duration;
-    const date = findUsernameById.date;
+    const description = findUsernameById.log[findUsernameById.log.length-1].description;
+    const duration = findUsernameById.log[findUsernameById.log.length-1].duration;
+    const date = findUsernameById.log[findUsernameById.log.length-1].date;
     res.json({ username, _id: userId, description, duration, date });
-    console.log("\"duration is a: " + typeof findUsernameById.duration + "\"")
+    console.log("\"duration is a: " + typeof findUsernameById.log.duration + "\"")
   })
 
 
@@ -228,35 +264,46 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
 
 app.get("/api/users/:_id/logs", async (req, res) => {
   // try {
-  const user = await UserData.findById(req.params._id);
-  let search = { userId: req.params._id };
-  if (req.query.from || req.query.to) {
-    search.date = {};
-    if (req.query.from) search.date["$gt"] = new Date(req.query.from);
-    if (req.query.to) search.date["$lt"] = new Date(req.query.to);
-  }
+  const userData = await UserData.findById(req.params._id);
 
-  let exercises;
-  if (req.query.limit) {
-    exercises = await UserData.find(search).limit(parseInt(req.query.limit));
-  } else {
-    exercises = await UserData.find(search);
-  }
+  // let logs = await UserData.findById(req.params._id);
+  // logs.map();
 
-  let log = exercises.map(exercise => {
-    return {
-      description: exercise.description,
-      duration: exercise.duration,
-      date: exercise.date.toDateString()
-    };
-  });
+  // let search = { userId: req.params._id };
+  // if (req.query.from || req.query.to) {
+  //   search.date = {};
+  //   if (req.query.from) search.date["$gt"] = new Date(req.query.from);
+  //   if (req.query.to) search.date["$lt"] = new Date(req.query.to);
+  // }
+
+  // let exercises;
+  // if (req.query.limit) {
+  //   exercises = await UserData.find(search).limit(parseInt(req.query.limit));
+  // } else {
+  //   exercises = await UserData.find(search);
+  // }
+
+  // let log = exercises.map(exercise => {
+  //   return {
+  //     description: exercise.description,
+  //     duration: exercise.duration,
+  //     date: exercise.date.toDateString()
+  //   };
+  // });
 
   res.json({
-    username: user.username,
-    count: log.length,
+    username: userData.username,
+    count: userData.log.length,
     _id: req.params._id,
-    log: log
+    log: userData.log
   });
+
+  // res.json({
+  //   username: user.username,
+  //   count: log.length,
+  //   _id: req.params._id,
+  //   log: log
+  // });
 
   // } catch (error) {
   //   res.send('error');
