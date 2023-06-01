@@ -263,19 +263,31 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
 // LOGS AND FILTERS
 
 app.get("/api/users/:_id/logs", async (req, res) => {
-  const from = new Date(req.query.from).toDateString();
-  const to = new Date(req.query.to).toDateString();
+  let from = new Date(req.query.from).getTime();
+  let to = new Date(req.query.to).getTime();
   const limit = req.query.limit;
 
-  console.log(from)
-
   const userData = await UserData.findById(req.params._id);
+  // console.log({log: userData.log[userData.log.length - 1].date});
+  // console.log("Date from log: "+userData.log[userData.log.length - 1].date);
+  // if (Array.isArray(userData.log)) {
+  //   console.log(userData.log[0].date)
+  //   console.log(Array.from(userData.log)) // array from log
+  // }
+
+  userData.log = userData.log.filter((session) => {
+    let sessionDate = new Date(session.date).getTime();
+    return sessionDate >= from && sessionDate <= to;
+  });
+
+  // console.log(userData.log.data)
+  // console.log(userData.log)
 
   // res.send(from)
   res.json({
     username: userData.username,
     count: userData.log.length,
     _id: req.params._id,
-    log: (userData.log).slice(0,limit)
+    log: (userData.log).slice(0, limit)
   });
 })
