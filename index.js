@@ -1,6 +1,5 @@
-// PRE-REQUISITIES: start http://localhost:3000/; nodemon .\index.js
+// PRE-REQUISITES: start http://localhost:3000/; nodemon .\index.js
 // GET user's exercise log: GET /api/users/:_id/logs?[from][&to][&limit]
-// https://exercise-tracker.freecodecamp.rocks/
 
 require('dotenv').config();
 const express = require('express');
@@ -24,13 +23,6 @@ app.listen(port, function () {
   console.log(`Listening on port ${port}`);
 })
 
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// USERS
-
 // Connect to database
 mongoose.connect(process.env.MONGO_URI);
 
@@ -53,20 +45,13 @@ const userSchema = new mongoose.Schema({
     type: Number
   },
   log: {
-    type: [
-      //   {
-      //   description: { type: String, required: true },
-      //   duration: { type: Number, required: true },
-      //   date: { type: String, required: true },
-      //   _id: {type: mongoose.Types.ObjectId, select: false}
-      // }
-    ],
-    // default: []
+    type: [],
   }
 });
 
 const UserData = mongoose.model('UserData', userSchema);
 
+// USERS
 app.post("/api/users", async (req, res) => {
   const postUserName = req.body.username;
   // const count = await UserData.find().count();
@@ -108,32 +93,7 @@ app.post("/api/users", async (req, res) => {
     res.json(users);
   })
 
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// EXERCISE
-
-// Create a Model
-const exercisesSchema = new mongoose.Schema({
-  description: {
-    type: String,
-    required: true
-  },
-  duration: {
-    type: Number,
-    required: true
-  },
-  date: {
-    type: String
-  }
-});
-
-// const ExercisesData = mongoose.model('ExercisesData', exercisesSchema);
-// const UserData = mongoose.model('UserData', userSchema);
-// const ExercisesData = mongoose.model('UserData', exercisesSchema); // same userData DB but schema is different
-
+// EXERCISES
 app.post("/api/users/:_id/exercises", async (req, res) => {
   const postUserId = req.params._id;
 
@@ -172,28 +132,7 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
         // const count = await UserData.find().count();
         const duration = parseInt(req.body.duration);
 
-        // await findExerciseById.updateOne(
-        //   { _id: postUserId },
-        //   { $push: { log:{aba: 445, dada: 785} }}
-        // )
-
-        // const logData = {
-        //   description: req.body.description,
-        //   duration: duration,
-        //   date: (req.body.date) ? new Date(req.body.date).toDateString() : new Date().toDateString(),
-        // }
-
-        const logData = [{
-          description: req.body.description,
-          duration: duration,
-          date: (req.body.date) ? new Date(req.body.date).toDateString() : new Date().toDateString(),
-        }]
-
         await findExerciseById.updateOne({
-          // count: count,
-          // description: req.body.description,
-          // duration: duration,
-          // date: (req.body.date) ? new Date(req.body.date).toDateString() : new Date().toDateString(),
           $push: {
             log: {
               description: req.body.description,
@@ -215,7 +154,7 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
         console.log(error.message);
       }
 
-      // if id does not exist then show a console log
+      // if id does not exist then show a message
     } else {
       // return res.json({ "error": "Requested ID does NOT exist in database" })
       res.send("Requested ID does NOT exist in database")
@@ -255,33 +194,32 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
     console.log("\"duration is a: " + typeof findUsernameById.log.duration + "\"")
   })
 
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // LOGS AND FILTERS
-
 app.get("/api/users/:_id/logs", async (req, res) => {
   let from = new Date(req.query.from).getTime();
   let to = new Date(req.query.to).getTime();
   const limit = req.query.limit;
 
   const userData = await UserData.findById(req.params._id);
+  // DEBUG
   // console.log({log: userData.log[userData.log.length - 1].date});
   // console.log("Date from log: "+userData.log[userData.log.length - 1].date);
   // if (Array.isArray(userData.log)) {
-  //   console.log(userData.log[0].date)
+  // console.log(userData.log[0].date)
   //   console.log(Array.from(userData.log)) // array from log
   // }
 
-  userData.log = userData.log.filter((session) => {
-    let sessionDate = new Date(session.date).getTime();
-    return sessionDate >= from && sessionDate <= to;
-  });
-
+  if (req.query.from || req.query.to) {
+    userData.log = userData.log.filter((session) => {
+      let sessionDate = new Date(session.date).getTime();
+      return sessionDate >= from && sessionDate <= to;
+    });
+  }
+  // DEBUG
   // console.log(userData.log.data)
   // console.log(userData.log)
+  // console.log(req.query)
+  // console.log(req.params._id)
 
   // res.send(from)
   res.json({
