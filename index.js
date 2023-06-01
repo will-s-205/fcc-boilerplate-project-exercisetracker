@@ -302,11 +302,12 @@ app.get("/api/users/:_id/logs", async (req, res) => {
     username: userData.username,
     count: userData.log.length,
     _id: req.params._id,
+    log: userData.log
     // log: d(userData.log.date),
     // log: userData.log.date = from >= userData.log.date && userData.log.date <= to
     // log: dates.slice(0, limit),
     // log: userData.log.date,
-    log: userData.log.date ? from : to,
+    // log: userData.log.date ? from : to,
     // log: userData.log.date ? userData.log.from : userData.log.to,
     // log: getDates(from, to).slice(0, limit)
   });
