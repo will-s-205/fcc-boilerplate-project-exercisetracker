@@ -263,19 +263,51 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
 // LOGS AND FILTERS
 
 app.get("/api/users/:_id/logs", async (req, res) => {
-  const from = new Date(req.query.from).toDateString();
-  const to = new Date(req.query.to).toDateString();
+  let from = new Date(req.query.from).toDateString();
+  let to = new Date(req.query.to).toDateString();
   const limit = req.query.limit;
 
   console.log(from)
 
   const userData = await UserData.findById(req.params._id);
 
-  // res.send(from)
+  // Returns an array of dates between the two dates
+  function getDates(startDate, endDate) {
+    const dates = []
+    let currentDate = startDate
+    const addDays = function (days) {
+      const date = new Date(this.valueOf())
+      date.setDate(date.getDate() + days)
+      return date
+    }
+    while (currentDate <= endDate) {
+      dates.push(currentDate)
+      currentDate = addDays.call(currentDate, 1)
+    }
+    return dates
+  }
+
+  // Usage
+  const dates = getDates(from, to)
+  dates.forEach(function (date) {
+    console.log(date)
+  })
+
+  const d = (date) => {
+    return from >= date && date <= to;
+  }
+  console.log(userData.log.date);
+
   res.json({
     username: userData.username,
     count: userData.log.length,
     _id: req.params._id,
-    log: userData.log
+    // log: d(userData.log.date),
+    // log: userData.log.date = from >= userData.log.date && userData.log.date <= to
+    // log: dates.slice(0, limit),
+    // log: userData.log.date,
+    log: userData.log.date ? from : to,
+    // log: userData.log.date ? userData.log.from : userData.log.to,
+    // log: getDates(from, to).slice(0, limit)
   });
 })
