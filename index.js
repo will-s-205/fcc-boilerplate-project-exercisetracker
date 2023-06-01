@@ -276,6 +276,6 @@ app.get("/api/users/:_id/logs", async (req, res) => {
     username: userData.username,
     count: userData.log.length,
     _id: req.params._id,
-    log: userData.log
+    log: (userData.log).slice(0,limit)
   });
 })
