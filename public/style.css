@@ -3,7 +3,7 @@
 }
 
 body {
-  font-family:sans-serif;
+	font-family: 'Roboto', sans-serif;
   margin: 25px;
   color: #222;
   background: radial-gradient(circle, rgba(213,213,213,1) 37%, rgba(187,187,187,1) 71%);
@@ -12,7 +12,7 @@ body {
 
 h1 {
   font-weight: bold;
-  
+  margin-top: 50px;
 }
 
 p {
@@ -20,13 +20,14 @@ p {
 }
 
 form {
-  margin-bottom: 25px;
+  margin-bottom: 10px;
   padding: 15px;
-  background-color: #87D37C;
+  background: radial-gradient(circle, rgba(2,193,34,0.6110819327731092) 0%, rgba(135,211,124,1) 100%);
   display: inline-block;
   width: 100%;
   max-width: 340px;
-  border-radius: 5px;
+  border-radius: 15px;
+  border: 3mm double rgba(53, 53, 53, 0.1);
 }
 
 input {
@@ -57,4 +58,12 @@ code {
   font-size: 1.2em;
   background-color: #FFFEC4;
   padding: 2px;
+  border-radius: 10px;
+  border: 1mm solid rgba(53, 53, 53, 0.1);
+}
+
+hr {
+	margin: 25px auto 35px;
+	height: 2px;
+	width: 100px;
 }
