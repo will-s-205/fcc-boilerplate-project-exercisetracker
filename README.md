@@ -5,4 +5,4 @@
 
 Based on user stories from [freeCodeCamp.org](https://www.freecodecamp.org/learn/apis-and-microservices/apis-and-microservices-projects/exercise-tracker). App stores user data in the database. Adds exercises and tracks them by calling logs. Additionally app utilizing filter feature.
 ## Goal
-App created as a part of the efforts to learn and practice Web Services
+App created as a part of the efforts to learn and practice APIs, MongoDB, JSON
